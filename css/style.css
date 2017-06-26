@@ -1,0 +1,18 @@
+body{
+  background-color: #fcfcfc;
+}
+
+div.container{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 200px;
+
+}
+
+div.banner{
+  margin-bottom: 10px;
+}
+
+div.banner, div.content{
+  text-align: center;
+}
