@@ -2,10 +2,11 @@
 
 
 
-    print_r();
-    if($_SERVER["REQUEST_METHOD"] == "GET"){
+    //Waiting for a get request with the domain of the site you want to traceroute
+    if(isset($_GET['domain']) && $_GET['domain']){
       echo json_encode(getHopsIp($_GET['domain']));
     }
+
 
     /**
     * This function takes in a domain an runs the traceroute command
