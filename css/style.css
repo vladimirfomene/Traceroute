@@ -5,7 +5,7 @@ body{
 div.container{
   margin-left: auto;
   margin-right: auto;
-  margin-top: 200px;
+  margin-top: 150px;
 
 }
 
@@ -15,4 +15,9 @@ div.banner{
 
 div.banner, div.content{
   text-align: center;
+}
+
+#map{
+  height: 100%;
+  margin: 0;
 }
