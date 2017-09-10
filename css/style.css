@@ -16,8 +16,3 @@ div.banner{
 div.banner, div.content{
   text-align: center;
 }
-
-#map{
-  height: 100%;
-  margin: 0;
-}

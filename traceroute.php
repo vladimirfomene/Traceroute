@@ -1,7 +1,5 @@
 <?php
 
-
-
     //Waiting for a get request with the domain of the site you want to traceroute
     if(isset($_GET['domain']) && $_GET['domain']){
       echo json_encode(getHopsIp($_GET['domain']));

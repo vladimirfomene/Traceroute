@@ -2,7 +2,17 @@
 <html>
   <head>
     <title>Traceroute-Online</title>
+
+    <!-- Custom styleSheet -->
     <link href="css/style.css" rel="stylesheet" type="text/css">
+
+    <style>
+      html, body {
+       height: 100%;
+       margin: 0;
+       padding: 0;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -15,22 +25,12 @@
           </form>
         </div>
         <div class="gmap-result">
-          <div id="map"></div>
         </div>
+        <div id="map" style="height: 500px;"></div>
       </div>
-      <div class="footer">
-      </div>
+      <div class="footer"></div>
     </div>
     <script>
-
-        //Add getter for long and lat properties of the Location object
-        /*Object.defineProperty(Location.prototype, "lat", {
-          get: function(){ return this.lat; }
-        });
-
-        Object.defineProperty(Location.prototype, "long", {
-          get: function(){ return this.long; }
-        });*/
 
 
         /* This codes sends a request to the server to get the ip addresses of the route */
@@ -48,7 +48,7 @@
               var Ips = JSON.parse(req.responseText);
 
               //Add user's location to ipLocations
-              getLocation();
+              getUserLocation();
 
               /*For each ip from server, append it as a text node and get its
               geolocation(lat, long) using the ipinfo.io api then print it to
@@ -60,13 +60,10 @@
                 resultArea.appendChild(ipTxt);
               }
 
-              var mapOptions = {
-                center: new google.maps.LatLng(5.758921,5.758921),
-                zoom: 12,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-              };
+              for(var location in ipLocations){
+                moveMarkerTo(location.lat, location.long);
+              }
 
-              new google.maps.Map(document.getElementById('map'), mapOptions);
             }
           });
           req.send(null);
@@ -80,7 +77,7 @@
 
         }
 
-        function getLocation() {
+        function getUserLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(addToIpLocations);
           } else {
@@ -93,6 +90,33 @@
           ipLocations.unshift(location);
         }
 
+        //Google map initialization
+        var map;
+        var marker;
+        function initMap(){
+          var mapOptions = {
+            center: new google.maps.LatLng(5.758921,-0.2209543),
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+          };
+
+          map = new google.maps.Map(document.getElementById('map'), mapOptions);
+          var iconBase = "img/"
+          marker = new google.maps.Marker({
+          	map: map,
+          	position: new google.maps.LatLng(5.758921, -0.2209543),
+          	icon: iconBase + "frontal-bus.png",
+          });
+        }
+
+        //move packet from user's destination to server destination
+        function moveMarkerTo(lat, long){
+          setTimeOut(function(){
+            marker.setPosition(new google.maps.LatLng(lat, long));
+            map.panTo(new google.maps.LatLng(lat, long));
+          }, 1500);
+        }
+
         /**
         Get location of an ip and create a new Location object and add it to
         ipLocations array **/
@@ -103,8 +127,7 @@
         }
 
         /* Creates a XMLHttpRequest request object for recent and old browsers */
-        function ajaxRequest()
-        {
+        function ajaxRequest(){
           try // Non IE Browser?
           {
             // Yes
@@ -139,8 +162,17 @@
           this.long = long;
         }
 
+        //Add getter for long and lat properties of the Location object
+        Object.defineProperty(Location.prototype, "lat", {
+          get: function(){ return this.lat; }
+        });
+
+        Object.defineProperty(Location.prototype, "long", {
+          get: function(){ return this.long; }
+        });
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi5XLlJPvGIvOx3lia08f307ahecCQhXM&callback=initMap"
-    type="text/javascript"></script>
+    <!-- Google maps javascript api -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi5XLlJPvGIvOx3lia08f307ahecCQhXM&callback=initMap"
+    async defer></script>
   </body>
 </html>
