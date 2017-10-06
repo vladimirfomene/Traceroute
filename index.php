@@ -6,27 +6,18 @@
     <!-- Custom styleSheet -->
     <link href="css/style.css" rel="stylesheet" type="text/css">
 
-    <style>
-      html, body {
-       height: 100%;
-       margin: 0;
-       padding: 0;
-      }
-    </style>
   </head>
   <body>
     <div class="container">
-      <div class="banner">Traceroute Online</div>
       <div class="content">
         <div class="user-form">
-          <form method="get">
+          <div class="form-header">Traceroute Online</div>
+          <form method="get" class="input-form">
             <input id="txtDomain" type="text" name="domain" placeholder="www.yourdomain.com"><br>
-            <input type="submit" value="submit">
+            <input type="submit" value="Submit" class="btn">
           </form>
         </div>
-        <div class="gmap-result">
-        </div>
-        <div id="map" style="height: 500px;"></div>
+        <div id="map"></div>
       </div>
       <div class="footer"></div>
     </div>
