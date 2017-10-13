@@ -26,34 +26,56 @@
 
         /* This codes sends a request to the server to get the ip addresses of the route */
         var ipLocations = [];
+        var iconBase = "img/";
         var domaintxtField = document.getElementById("txtDomain");
         var form = document.querySelector("form");
         console.log(domaintxtField.value);
         form.addEventListener("submit", function(event){
           var req = ajaxRequest();
+          var userForm = document.getElementsByClassName("user-form");
           console.log(domaintxtField.value);
           req.open("GET", "traceroute.php?domain=" + domaintxtField.value, true);
           req.addEventListener("load", function() {
             if(req.status == 200 && req.readyState == 4){
               //Get the result as a js object
               var Ips = JSON.parse(req.responseText);
+              console.log(Ips);
 
               //Add user's location to ipLocations
-              getUserLocation();
+              //getUserLocation();
 
               /*For each ip from server, append it as a text node and get its
               geolocation(lat, long) using the ipinfo.io api then print it to
               the console */
               for(var ip in Ips){
-                var resultArea = document.querySelector(".gmap-result");
                 getLocationData(Ips[ip]);
-                var ipTxt = document.createTextNode(Ips[ip]);
-                resultArea.appendChild(ipTxt);
               }
 
-              for(var location in ipLocations){
-                moveMarkerTo(location.lat, location.long);
-              }
+              //userForm.style.visibility = "hidden";
+              var locations = filterLocations(ipLocations);
+              locations.shift();
+              locations.shift();
+
+              // Define the symbol, using one of the predefined paths ('CIRCLE')
+              // supplied by the Google Maps JavaScript API.
+              var lineSymbol = {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                strokeColor: '#393'
+              };
+
+              // Create the polyline and add the symbol to it via the 'icons' property.
+              var line = new google.maps.Polyline({
+                path: locations,
+                icons: [{
+                  icon: lineSymbol,
+                  offset: '100%'
+                }],
+                map: map
+              });
+
+              animatePacket(line);
+
 
             }
           });
@@ -77,8 +99,43 @@
         }
 
         function addToIpLocations(position){
-          var location = new Location(position.coords.latitude, position.coords.longitude);
-          ipLocations.unshift(location);
+          //var location = new Location(position.coords.latitude, position.coords.longitude);
+          //ipLocations.unshift(location);
+          ipLocations.push({lat: Number(position.coords.latitude), lng: Number(position.coords.latitude)});
+        }
+
+
+        /**Get location of an ip and create a new Location object and add it to
+        ipLocations array **/
+        function getLocByIp(location){
+            var LatLong = String(location.loc).split(",");
+            ipLocations.push({lat: Number(LatLong[0]), lng: Number(LatLong[1])});
+        }
+
+
+        function filterLocations(locations){
+          var filteredLocations = [];
+          locations.forEach(function(location){
+            if(!isNaN(location.lat) && !isNaN(location.lng)){
+              filteredLocations.push(location);
+            }
+
+          });
+
+          return filteredLocations;
+        }
+
+        // Use the DOM setInterval() function to change the offset of the symbol
+      // at fixed intervals.
+        function animatePacket(line) {
+            var count = 0;
+            window.setInterval(function() {
+              count = (count + 1) % 200;
+
+              var icons = line.get('icons');
+              icons[0].offset = (count / 2) + '%';
+              line.set('icons', icons);
+          }, 100);
         }
 
         //Google map initialization
@@ -92,29 +149,7 @@
           };
 
           map = new google.maps.Map(document.getElementById('map'), mapOptions);
-          var iconBase = "img/"
-          marker = new google.maps.Marker({
-          	map: map,
-          	position: new google.maps.LatLng(5.758921, -0.2209543),
-          	icon: iconBase + "frontal-bus.png",
-          });
-        }
 
-        //move packet from user's destination to server destination
-        function moveMarkerTo(lat, long){
-          setTimeOut(function(){
-            marker.setPosition(new google.maps.LatLng(lat, long));
-            map.panTo(new google.maps.LatLng(lat, long));
-          }, 1500);
-        }
-
-        /**
-        Get location of an ip and create a new Location object and add it to
-        ipLocations array **/
-        function getLocByIp(location){
-          var LatLong = String(location.loc).split(",");
-          var geoLocation = new Location(LatLong[0], LatLong[1]);
-          ipLocations.push(geoLocation);
         }
 
         /* Creates a XMLHttpRequest request object for recent and old browsers */
@@ -147,20 +182,6 @@
           return request
         }
 
-        //Constructor for position object
-        function Location(lat, long){
-          this.lat = lat;
-          this.long = long;
-        }
-
-        //Add getter for long and lat properties of the Location object
-        Object.defineProperty(Location.prototype, "lat", {
-          get: function(){ return this.lat; }
-        });
-
-        Object.defineProperty(Location.prototype, "long", {
-          get: function(){ return this.long; }
-        });
     </script>
     <!-- Google maps javascript api -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi5XLlJPvGIvOx3lia08f307ahecCQhXM&callback=initMap"

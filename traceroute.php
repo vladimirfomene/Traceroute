@@ -12,7 +12,7 @@
     * in an associative array.
     **/
     function getHopsIp($domain){
-      $routes = shell_exec("traceroute " . $domain);
+      $routes = shell_exec("tracert " . $domain);
       preg_match_all('/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/',
       $routes, $matches, PREG_PATTERN_ORDER);
       $match = $matches[0];
